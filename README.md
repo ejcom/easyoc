@@ -54,7 +54,7 @@ MIT License
 
 ## Author
 
-[Your Name]
+EJCOM
 
 ## Support
 
