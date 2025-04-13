@@ -1,0 +1,21 @@
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+
+# User configuration files
+.*_easyoc_totp_google
+.*_easyoc_domain
+
+# IDE specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace 
