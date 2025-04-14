@@ -95,8 +95,7 @@ if [ "$use_zsh" = "y" ]; then
     vpn_function="function ${alias_name}_vpn() {
     read -s 'password?Enter password: '
     local otp=\$(cat ~/.${alias_name}_easyoc_totp_google | xargs oathtool --totp -b)
-    local domains=\$(cat ~/.${alias_name}_easyoc_domain | tr '\n' ' ')
-    echo -e \"\$password\n\$otp\" | sudo openconnect --useragent=AnyConnect --user ${vpn_username} --syslog --passwd-on-stdin --script 'vpn-slice \$domains' ${vpn_url}
+    echo -e \"\$password\n\$otp\" | sudo openconnect --useragent=AnyConnect --user ${vpn_username} --syslog --passwd-on-stdin --script 'vpn-slice $(cat ~/.${alias_name}_easyoc_domain)' ${vpn_url}
 }"
     # Add the function to .zshrc
     echo "$vpn_function" >> ~/.zshrc
@@ -106,8 +105,7 @@ else
     read -s -p 'Enter password: ' password
     echo
     local otp=\$(cat ~/.${alias_name}_easyoc_totp_google | xargs oathtool --totp -b)
-    local domains=\$(cat ~/.${alias_name}_easyoc_domain | tr '\n' ' ')
-    echo -e \"\$password\n\$otp\" | sudo openconnect --useragent=AnyConnect --user ${vpn_username} --syslog --passwd-on-stdin --script 'vpn-slice \$domains' ${vpn_url}
+    echo -e \"\$password\n\$otp\" | sudo openconnect --useragent=AnyConnect --user ${vpn_username} --syslog --passwd-on-stdin --script 'vpn-slice $(cat ~/.${alias_name}_easyoc_domain)' ${vpn_url}
 }"
     # Add the function to .bash_profile
     echo "$vpn_function" >> ~/.bash_profile
