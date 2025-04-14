@@ -28,7 +28,7 @@ EasyOC is a simple script that simplifies the process of connecting to a VPN via
 
 1. Download the script:
 ```bash
-curl -O https://raw.githubusercontent.com/yourusername/easyoc/main/easyoc_install.sh
+curl -O https://raw.githubusercontent.com/ejcom/easyoc/master/easyoc_install.sh
 ```
 
 2. Make the script executable:
@@ -47,10 +47,13 @@ chmod +x easyoc_install.sh
 
 1. Download the script:
 ```powershell
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yourusername/easyoc/main/easyoc_install.ps1" -OutFile "easyoc_install.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ejcom/easyoc/master/easyoc_install.ps1" -OutFile "easyoc_install.ps1"
 ```
 
 2. Run PowerShell as Administrator and execute:
+```powershell
+.\easyoc_install.ps1
+```
 ```powershell
 .\easyoc_install.ps1
 ```

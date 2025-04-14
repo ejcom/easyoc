@@ -80,7 +80,11 @@ if (Test-Path $domain_file) {
 New-Item -Path $totp_file -ItemType File -Force | Out-Null
 New-Item -Path $domain_file -ItemType File -Force | Out-Null
 
-# Create VPN function
+# Get OpenConnect installation path
+$openconnectPath = (Get-Command openconnect).Source
+$vpncScriptPath = Join-Path (Split-Path $openconnectPath -Parent) "vpnc-script-win.js"
+
+# Create VPN function with Windows-specific parameters
 $vpn_function = @"
 function global:${alias_name}_vpn {
     `$securePassword = Read-Host "Enter password" -AsSecureString
@@ -88,7 +92,21 @@ function global:${alias_name}_vpn {
     `$otp = Get-Content "$env:USERPROFILE\.${alias_name}_easyoc_totp_google" | oathtool --totp -b
     `$domain = Get-Content "$env:USERPROFILE\.${alias_name}_easyoc_domain"
     
-    `$password + "`n" + `$otp | openconnect --useragent=AnyConnect --user ${vpn_username} --syslog --passwd-on-stdin --script "vpn-slice `$domain" ${vpn_url}
+    try {
+        `$password + "`n" + `$otp | openconnect `
+            --useragent=AnyConnect `
+            --user ${vpn_username} `
+            --syslog `
+            --passwd-on-stdin `
+            --script "$vpncScriptPath" `
+            --os=win `
+            --no-dtls `
+            ${vpn_url}
+    }
+    catch {
+        Write-Error "Failed to connect to VPN: `$(`$_.Exception.Message)"
+        exit 1
+    }
 }
 "@
 
