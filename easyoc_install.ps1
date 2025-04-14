@@ -32,9 +32,39 @@ if (-not (Test-CommandExists openconnect)) {
     choco install openconnect -y
 }
 
-if (-not (Test-CommandExists oathtool)) {
-    Write-Host "Installing OATH Toolkit..."
-    choco install oath-toolkit -y
+# Function to generate TOTP
+function Get-TOTP {
+    param (
+        [string]$Secret
+    )
+    
+    # Convert secret to bytes
+    $secretBytes = [System.Convert]::FromBase64String($Secret)
+    
+    # Get current Unix timestamp divided by 30 (TOTP time step)
+    $timestamp = [math]::Floor([decimal](Get-Date -UFormat %s) / 30)
+    
+    # Convert timestamp to bytes
+    $timestampBytes = [System.BitConverter]::GetBytes([int64]$timestamp)
+    [array]::Reverse($timestampBytes)
+    
+    # Calculate HMAC-SHA1
+    $hmac = New-Object System.Security.Cryptography.HMACSHA1
+    $hmac.Key = $secretBytes
+    $hash = $hmac.ComputeHash($timestampBytes)
+    
+    # Get offset from last 4 bits of hash
+    $offset = $hash[$hash.Length - 1] -band 0xf
+    
+    # Get 4 bytes starting at offset
+    $binary = (($hash[$offset] -band 0x7f) -shl 24) -bor
+              (($hash[$offset + 1] -band 0xff) -shl 16) -bor
+              (($hash[$offset + 2] -band 0xff) -shl 8) -bor
+              ($hash[$offset + 3] -band 0xff)
+    
+    # Get 6-digit code
+    $code = $binary % 1000000
+    return "{0:D6}" -f $code
 }
 
 # Get user input
@@ -89,7 +119,8 @@ $vpn_function = @"
 function global:${alias_name}_vpn {
     `$securePassword = Read-Host "Enter password" -AsSecureString
     `$password = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR(`$securePassword))
-    `$otp = Get-Content "$env:USERPROFILE\.${alias_name}_easyoc_totp_google" | oathtool --totp -b
+    `$secret = Get-Content "$env:USERPROFILE\.${alias_name}_easyoc_totp_google"
+    `$otp = Get-TOTP -Secret `$secret
     `$domain = Get-Content "$env:USERPROFILE\.${alias_name}_easyoc_domain"
     
     try {
@@ -118,6 +149,6 @@ if (-not (Test-Path $profilePath)) {
 Add-Content -Path $profilePath -Value $vpn_function
 
 Write-Host "Installation completed successfully!"
-Write-Host "Please add your Google Authenticator token to $totp_file"
+Write-Host "Please add your Google Authenticator secret (base32 encoded) to $totp_file"
 Write-Host "Restart PowerShell and run '${alias_name}_vpn' to connect to VPN"
-Write-Host "Example command: Set-Content -Path '$totp_file' -Value 'YOUR_GOOGLE_AUTH_TOKEN'" 
+Write-Host "Example command: Set-Content -Path '$totp_file' -Value 'YOUR_BASE32_ENCODED_SECRET'" 
