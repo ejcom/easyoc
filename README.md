@@ -28,7 +28,7 @@ EasyOC is a simple script that simplifies the process of connecting to a VPN via
 
 1. Download the script:
 ```bash
-curl -O https://raw.githubusercontent.com/yourusername/easyoc/main/easyoc_install.sh
+curl -O https://raw.githubusercontent.com/ejcom/easyoc/main/easyoc_install.sh
 ```
 
 2. Make the script executable:
