@@ -47,7 +47,7 @@ chmod +x easyoc_install.sh
 
 1. Download the script:
 ```powershell
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/yourusername/easyoc/main/easyoc_install.ps1" -OutFile "easyoc_install.ps1"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ejcom/easyoc/main/easyoc_install.ps1" -OutFile "easyoc_install.ps1"
 ```
 
 2. Run PowerShell as Administrator and execute:
